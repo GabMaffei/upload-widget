@@ -1,0 +1,57 @@
+import * as Collapsible from '@radix-ui/react-collapsible'
+import { motion, useCycle } from 'motion/react'
+import { UploadWidgetDropzone } from './upload-widget-dropzone'
+import { UploadWidgetHeader } from './upload-widget-header'
+import { UploadWidgetMinimizedButton } from './upload-widget-minimized-button'
+import { UploadWidgetUploadList } from './upload-widget-upload-list'
+
+export function UploadWidget() {
+  const isThereAnyPendingUpload = true
+
+  const [isWidgetOpen, toggleWidgetOpen] = useCycle(false, true)
+
+  return (
+    <Collapsible.Root onOpenChange={() => toggleWidgetOpen()} asChild>
+      <motion.div
+        className={`
+        bg-zinc-900 overflow-hidden max-w-[360px] rounded-xl
+        data-[state=open]:box-shadow-shape
+        data-[state=closed]:rounded-3xl
+        box-shadow-shape
+        animate-border-conditional`}
+        data-progress={isThereAnyPendingUpload}
+        animate={isWidgetOpen ? 'open' : 'closed'}
+        variants={{
+          closed: {
+            width: 'max-content',
+            height: 44,
+            transition: {
+              layout: isWidgetOpen
+                ? { type: 'inertia', bounceStiffness: 400, bounceDamping: 40 }
+                : { type: 'spring', stiffness: 300, damping: 30 },
+            },
+          },
+          open: {
+            width: 360,
+            height: 'auto',
+            transition: {
+              duration: 0.1,
+            },
+          },
+        }}
+      >
+        {!isWidgetOpen && <UploadWidgetMinimizedButton />}
+        <Collapsible.Content>
+          <UploadWidgetHeader />
+          <div className="flex flex-col gap-4 py-3">
+            <UploadWidgetDropzone />
+
+            <div className="h-px bg-zinc-800 border-t border-black/[0.5] box-content"></div>
+
+            <UploadWidgetUploadList />
+          </div>
+        </Collapsible.Content>
+      </motion.div>
+    </Collapsible.Root>
+  )
+}
